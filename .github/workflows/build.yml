@@ -1,0 +1,74 @@
+name: Build-IPA-unsigned
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        run: |
+          set -e
+          CANDIDATE=$(ls -d /Applications/Xcode*16*.app 2>/dev/null | head -n1)
+          if [ -z "$CANDIDATE" ]; then
+            echo "Xcode 16 no encontrado"; xcodebuild -version; exit 1
+          fi
+          sudo xcode-select -s "$CANDIDATE/Contents/Developer"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Build (no signing)
+        run: |
+          set -e
+          xcodebuild             -project TeamsWeb.xcodeproj             -scheme TeamsWeb             -configuration Release             -sdk iphoneos             -destination 'generic/platform=iOS'             BUILD_DIR=$PWD/build             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY=""             clean build
+
+      - name: Determine .app path
+        id: ap
+        run: |
+          set -e
+          BUILD_DIR="$PWD/build"
+          SETTINGS=$(mktemp)
+          xcodebuild             -project TeamsWeb.xcodeproj             -scheme TeamsWeb             -configuration Release             -sdk iphoneos             BUILD_DIR=$BUILD_DIR             -showBuildSettings > "$SETTINGS"
+          APP_DIR=$(awk -F ' = ' '/ TARGET_BUILD_DIR /{print $2; exit}' "$SETTINGS")
+          WRAPPER=$(awk -F ' = ' '/ WRAPPER_NAME /{print $2; exit}' "$SETTINGS")
+          APP_PATH="$APP_DIR/$WRAPPER"
+          echo "TARGET_BUILD_DIR=$APP_DIR"
+          echo "WRAPPER_NAME=$WRAPPER"
+          echo "APP_PATH=$APP_PATH"
+          if [ ! -d "$APP_PATH" ]; then
+            ALT="$BUILD_DIR/Release-iphoneos/TeamsWeb.app"
+            if [ -d "$ALT" ]; then
+              APP_PATH="$ALT"
+              echo "Usando fallback: $APP_PATH"
+            else
+              echo "❌ No se encontró el .app"; find "$BUILD_DIR" -name "TeamsWeb.app" -maxdepth 6 -type d -print; exit 1
+            fi
+          fi
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare IPA
+        run: |
+          set -e
+          APP_PATH="${{ steps.ap.outputs.APP_PATH }}"
+          rm -rf Payload
+          mkdir -p Payload
+          /usr/bin/ditto "$APP_PATH" "Payload/TeamsWeb.app"
+          /usr/bin/ditto -c -k --sequesterRsrc --keepParent Payload TeamsWeb-unsigned.ipa
+          unzip -t TeamsWeb-unsigned.ipa
+          ls -lh TeamsWeb-unsigned.ipa
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TeamsWeb-unsigned
+          path: TeamsWeb-unsigned.ipa
