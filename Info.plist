@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key><string>en</string>
+    <key>CFBundleDisplayName</key><string>TeamsWeb</string>
+    <key>CFBundleIdentifier</key><string>com.yourid.TeamsWeb</string>
+    <key>CFBundleName</key><string>TeamsWeb</string>
+    <key>CFBundleShortVersionString</key><string>1.0.0</string>
+    <key>CFBundleVersion</key><string>1</string>
+    <key>LSRequiresIPhoneOS</key><true/>
+    <key>UIApplicationSupportsIndirectInputEvents</key><true/>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>NSCameraUsageDescription</key><string>Se requiere cámara para videollamadas.</string>
+    <key>NSMicrophoneUsageDescription</key><string>Se requiere micrófono para llamadas.</string>
+    <key>NSPhotoLibraryUsageDescription</key><string>Se requiere acceso a la galería para subir archivos.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key><string>Se requiere para guardar adjuntos.</string>
+    <key>NSAppTransportSecurity</key><dict><key>NSAllowsArbitraryLoadsInWebContent</key><true/></dict>
+    <key>UIBackgroundModes</key><array><string>audio</string></array>
+</dict>
+</plist>

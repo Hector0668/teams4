@@ -1,0 +1,21 @@
+name: TeamsWeb
+options:
+  minimumXcodeGenVersion: 2.14.0
+targets:
+  TeamsWeb:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: Sources
+    resources:
+      - path: Resources
+    info:
+      path: Info.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.yourid.TeamsWeb
+      SWIFT_VERSION: 5.0
+      CODE_SIGN_STYLE: Manual
+      DEVELOPMENT_TEAM: ""
+    scheme:
+      testTargets: []
